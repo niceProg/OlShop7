@@ -14,7 +14,7 @@ class CartController extends Controller
             'id' => $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'quantity' => 4,
+            'quantity' => 1,
             'attributes' => array(),
             'associatedModel' => $product
         ));
@@ -24,6 +24,27 @@ class CartController extends Controller
 
     public function index()
     {
-        return view('cart.index');
+        $cartItems = \Cart::session(auth()->id())->getContent();
+
+        return view('cart.index', compact('cartItems'));
+    }
+
+    public function destroy($itemId)
+    {
+        \Cart::session(auth()->id())->remove($itemId);
+
+        return back();
+    }
+
+    public function update($rowId)
+    {
+        \Cart::session(auth()->id())->update($rowId, [
+            'quantity' => [
+                'relative' => false,
+                'value' => request('quantity')
+            ]
+        ]);
+
+        return back();
     }
 }
